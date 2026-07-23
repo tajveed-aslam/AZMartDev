@@ -5,6 +5,8 @@ import Image from "next/image";
 import api from "@/lib/api";
 import { getImageUrl } from "@/lib/formatters";
 import { useCurrency } from "@/hooks/useCurrency";
+import { useCartStore } from "@/store/cartStore";
+import { useUIStore } from "@/store/uiStore";
 import type { Product } from "@/types";
 
 interface Message {
@@ -20,6 +22,8 @@ const INITIAL_MESSAGE: Message = {
 
 export function ChatBot() {
   const { format } = useCurrency();
+  const addItem = useCartStore((s) => s.addItem);
+  const addToast = useUIStore((s) => s.addToast);
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
@@ -41,6 +45,14 @@ export function ChatBot() {
     try {
       const res = await api.post("/chat", { message: text });
       setMessages((prev) => [...prev, { role: "bot", text: res.data.reply, products: res.data.products }]);
+      // The reply text alone is never trusted for cart mutations — only an
+      // explicit `action` from the backend (which validated stock and found
+      // a real product) actually touches the cart, via the same store
+      // ProductCard's "Add to Cart" button uses.
+      if (res.data.action?.type === "add_to_cart" && res.data.action.product) {
+        addItem(res.data.action.product);
+        addToast(`${res.data.action.product.name} added to cart!`);
+      }
     } catch {
       setMessages((prev) => [...prev, { role: "bot", text: "Sorry, I couldn't connect right now. Please try again." }]);
     } finally {

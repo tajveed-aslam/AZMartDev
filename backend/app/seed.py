@@ -6,36 +6,33 @@ from .models.user import Role
 from .models.order import OrderStatus
 from .services.auth_service import hash_password
 
+# Imported last and deliberately not part of the `from .models import *`
+# above: importing app.models.settings (the StoreSettings model submodule)
+# auto-binds the name `settings` on the app.models package as a side effect
+# of Python's import machinery, which would otherwise shadow this and
+# silently break demo_admin_password below.
+from .config import settings
+
 Base.metadata.create_all(bind=engine)
 
-_U = "https://images.unsplash.com/photo-{id}?w=600&h=600&fit=crop&auto=format"
-
+# Real product photos (frontend/public/products/*.jpg), sourced from
+# Pixabay (free commercial-use license, no attribution required) and
+# shipped as static frontend assets — not hotlinked. The previous version
+# reused a shared pool of ~25 Unsplash photo IDs across unrelated products
+# (e.g. the same photo ID for both "armani-code" and "versace-eros"),
+# several of which had since gone dead (404), and none of which actually
+# depicted the named product. Each was individually reviewed (not just
+# keyword-matched) to confirm it's actually relevant and doesn't show a
+# competing brand's logo or an identifiable person/child.
 PRODUCT_IMAGES = {
-    "armani-code":      [_U.format(id="1523293182086-7651a899d37f"), _U.format(id="1541643600914-78b084683702")],
-    "hugo-boss":        [_U.format(id="1592945403244-b3fbafd7f539"), _U.format(id="1590156206657-aeffd4e1b1ac")],
-    "versace-eros":     [_U.format(id="1616949870906-a41803e8da4d"), _U.format(id="1523293182086-7651a899d37f")],
-    "davidoff-cw":      [_U.format(id="1541643600914-78b084683702"), _U.format(id="1592945403244-b3fbafd7f539")],
-    "ysl-y":            [_U.format(id="1590156206657-aeffd4e1b1ac"), _U.format(id="1616949870906-a41803e8da4d")],
-    "nike-am270":       [_U.format(id="1542291026-7eec264c27ff"), _U.format(id="1608231387042-66d1773070a5")],
-    "adidas-ub23":      [_U.format(id="1608231387042-66d1773070a5"), _U.format(id="1543163521-1bf539c55dd2")],
-    "puma-rsx":         [_U.format(id="1543163521-1bf539c55dd2"), _U.format(id="1556906781-9a412961a28c")],
-    "nb-574":           [_U.format(id="1556906781-9a412961a28c"), _U.format(id="1597045566677-8cf032ed6634")],
-    "reebok-classic":   [_U.format(id="1597045566677-8cf032ed6634"), _U.format(id="1542291026-7eec264c27ff")],
-    "earbuds-pro":      [_U.format(id="1590658268037-6bf12165a8df"), _U.format(id="1606220838-1f6d4c3c6ba8")],
-    "bt-speaker":       [_U.format(id="1608043152269-423dbba4e7e1"), _U.format(id="1545454675-3b625bfbeb08")],
-    "usb-hub":          [_U.format(id="1600003263720-95b45a86035d"), _U.format(id="1563770660941-55234f33bec8")],
-    "ring-light":       [_U.format(id="1497366811353-6870744d04b2"), _U.format(id="1515378791036-0648a3ef77b2")],
-    "gan-charger":      [_U.format(id="1625772452859-1c03d5bf1137"), _U.format(id="1585771724684-b4ed66f8e07a")],
-    "crystal-choker":   [_U.format(id="1515562141207-7a88fb7ce338"), _U.format(id="1535632066927-ab7c9ab60908")],
-    "boho-ear-cuff":    [_U.format(id="1535632066927-ab7c9ab60908"), _U.format(id="1573408301185-9519f94cf3c2")],
-    "layered-necklace": [_U.format(id="1599643478518-a784e5dc4c8f"), _U.format(id="1515562141207-7a88fb7ce338")],
-    "charm-bracelet":   [_U.format(id="1573408301185-9519f94cf3c2"), _U.format(id="1602173574767-37ac01994b2a")],
-    "statement-rings":  [_U.format(id="1602173574767-37ac01994b2a"), _U.format(id="1599643478518-a784e5dc4c8f")],
-    "lego-classic":     [_U.format(id="1558618666-fcd25c85cd64"), _U.format(id="1594736797933-d0501ba2fe65")],
-    "rc-car":           [_U.format(id="1594736797933-d0501ba2fe65"), _U.format(id="1558618666-fcd25c85cd64")],
-    "slime-kit":        [_U.format(id="1596070982838-8ce6bb1a90f1"), _U.format(id="1563396983906-b3795482a59a")],
-    "kinetic-sand":     [_U.format(id="1551698618-1dfe5d97d256"), _U.format(id="1596070982838-8ce6bb1a90f1")],
-    "playdoh-mega":     [_U.format(id="1563396983906-b3795482a59a"), _U.format(id="1551698618-1dfe5d97d256")],
+    slug: [f"/products/{slug}.jpg"]
+    for slug in [
+        "armani-code", "hugo-boss", "versace-eros", "davidoff-cw", "ysl-y",
+        "nike-am270", "adidas-ub23", "puma-rsx", "nb-574", "reebok-classic",
+        "earbuds-pro", "bt-speaker", "usb-hub", "ring-light", "gan-charger",
+        "crystal-choker", "boho-ear-cuff", "layered-necklace", "charm-bracelet", "statement-rings",
+        "lego-classic", "rc-car", "slime-kit", "kinetic-sand", "playdoh-mega",
+    ]
 }
 
 CATEGORIES = [
@@ -79,11 +76,14 @@ PRODUCTS = [
     {"name": "Play-Doh Mega Set",      "slug": "playdoh-mega",      "category": "toys",         "price": 2800,  "original_price": 3800,  "stock": 20, "rating": 4.8, "review_count": 198, "featured": True,  "desc": "65-piece mega set with 15 cans of dough and 50 accessories. Imported USA."},
 ]
 
-USERS = [
-    {"email": "admin@azmart.pk",   "full_name": "A&Z Admin",     "password": "Admin@123",  "role": Role.admin},
-    {"email": "sara@example.com",  "full_name": "Sara Khan",      "password": "Sara@1234",  "role": Role.customer},
-    {"email": "ali@example.com",   "full_name": "Ali Hassan",     "password": "Ali@12345",  "role": Role.customer},
-]
+def _users():
+    # Admin password is configurable (settings.demo_admin_password) rather
+    # than hardcoded — see config.py for why.
+    return [
+        {"email": "admin@azmart.pk",  "full_name": "A&Z Admin", "password": settings.demo_admin_password, "role": Role.admin},
+        {"email": "sara@example.com", "full_name": "Sara Khan",  "password": "Sara@1234",  "role": Role.customer},
+        {"email": "ali@example.com",  "full_name": "Ali Hassan", "password": "Ali@12345",  "role": Role.customer},
+    ]
 
 
 def seed():
@@ -130,7 +130,7 @@ def seed():
 
         # Users
         user_map = {}
-        for u in USERS:
+        for u in _users():
             existing = db.query(User).filter(User.email == u["email"]).first()
             if not existing:
                 obj = User(
@@ -185,7 +185,7 @@ def seed():
             db.commit()
 
         print("Database seeded successfully!")
-        print("   Admin: admin@azmart.pk / Admin@123")
+        print(f"   Admin: admin@azmart.pk / {settings.demo_admin_password}")
         print("   User1: sara@example.com / Sara@1234")
         print("   User2: ali@example.com / Ali@12345")
 

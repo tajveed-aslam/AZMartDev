@@ -20,8 +20,12 @@ export function truncate(str: string, length: number): string {
 }
 
 export function getImageUrl(url: string): string {
-  if (!url) return "https://picsum.photos/seed/default/600/600";
-  if (url.startsWith("http")) return url;
+  if (!url) return "/products/placeholder.svg";
+  // Absolute URLs (external) and /products/* (shipped as static frontend
+  // assets in public/) are used as-is. Anything else is assumed to be a
+  // backend-relative path (e.g. /static/uploads/... from the admin image
+  // upload endpoint) and gets the API origin prefixed.
+  if (url.startsWith("http") || url.startsWith("/products/")) return url;
   return `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}${url}`;
 }
 

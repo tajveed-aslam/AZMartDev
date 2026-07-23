@@ -6,7 +6,7 @@ import Image from "next/image";
 const SLIDES = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=1600&h=700&fit=crop&auto=format",
+    image: "/banners/perfumes.jpg",
     tag: "🌸 New Arrivals",
     heading: "Premium Imported Fragrances",
     sub: "Authentic perfumes from UAE, Europe & beyond",
@@ -19,7 +19,7 @@ const SLIDES = [
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&h=700&fit=crop&auto=format",
+    image: "/banners/shoes.jpg",
     tag: "👟 Brand Originals",
     heading: "Nike, Adidas & More",
     sub: "Genuine imported sneakers — direct from the source",
@@ -32,7 +32,7 @@ const SLIDES = [
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=1600&h=700&fit=crop&auto=format",
+    image: "/banners/electronics.jpg",
     tag: "🔌 Tech Accessories",
     heading: "Latest Electronics & Gadgets",
     sub: "Earbuds, speakers, chargers & hubs — all imported",
@@ -45,7 +45,7 @@ const SLIDES = [
   },
   {
     id: 4,
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&h=700&fit=crop&auto=format",
+    image: "/banners/jewellery.jpg",
     tag: "💍 New Collection",
     heading: "Jewellery for Every Occasion",
     sub: "Necklaces, earrings, bracelets & rings — imported & gorgeous",
@@ -58,7 +58,7 @@ const SLIDES = [
   },
   {
     id: 5,
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&h=700&fit=crop&auto=format",
+    image: "/banners/toys.jpg",
     tag: "🧸 Kids Corner",
     heading: "Toys That Spark Imagination",
     sub: "LEGO, RC cars, kinetic sand & more — all genuine imports",

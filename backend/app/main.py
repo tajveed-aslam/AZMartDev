@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from .config import settings as app_settings
 from .database import engine, Base
 from .models import *  # noqa: F401 — ensure all models are registered
 from .routers import auth, categories, products, upload, cart, orders, admin, settings, chat
@@ -17,7 +18,7 @@ app = FastAPI(title="A&Z Mart API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=app_settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
